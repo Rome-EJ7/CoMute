@@ -1,4 +1,5 @@
 ﻿using CoMute.Web.Models.Dto;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -14,7 +15,19 @@ namespace CoMute.Web.Controllers.API
         /// <returns></returns>
         public HttpResponseMessage Post(LoginRequest loginRequest)
         {
-            return Request.CreateResponse(HttpStatusCode.NotFound);
+            var context = new CoMuteDBEntities();
+
+            var user = context.Users.Where(zz => zz.Email == loginRequest.Email && zz.Password == loginRequest.Password).FirstOrDefault();
+            if (user == null)// check to see if user exists
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            else
+            {
+                //returning the matching user info so the userID can be stored and used to make the other requests
+                return Request.CreateResponse(HttpStatusCode.OK, user);
+            }
+          
         }
     }
 }
